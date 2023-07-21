@@ -1,28 +1,37 @@
-let imageCollection = document.getElementsByClassName("image");
+const parent = document.getElementById("parent");
+const images = document.querySelectorAll(".image");
 
-let divToSwap = [];
+let selected = null;
 
-for (let i = 0; i < imageCollection.length; i++) {
-    imageCollection[i].addEventListener("dragstart", function(event) {
-        divToSwap[0] = event.target.id;
-    });
+// Event listener for the drag start event
+parent.addEventListener("dragstart", (event) => {
+  selected = event.target;
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/html", selected.outerHTML);
+});
 
-    imageCollection[i].addEventListener("dragover", function(event) {
-        event.preventDefault();
-    });
+// Event listener for the drag over event
+parent.addEventListener("dragover", (event) => {
+  event.preventDefault();
+  if (event.target.classList.contains("image")) {
+    event.target.classList.add("selected");
+  }
+});
 
-    imageCollection[i].addEventListener("drop", function(event) {
-        divToSwap[1] = event.target.id;
+// Event listener for the drag leave event
+parent.addEventListener("dragleave", (event) => {
+  event.preventDefault();
+  if (event.target.classList.contains("image")) {
+    event.target.classList.remove("selected");
+  }
+});
 
-        if (
-            divToSwap[0] != divToSwap[1] &&
-            divToSwap[0] != "" &&
-            divToSwap[1] != ""
-        ) {
-            let div1 = document.getElementById(divToSwap[0]);
-            let div2 = document.getElementById(divToSwap[1]);
-            div1.setAttribute("id", divToSwap[1]);
-            div2.setAttribute("id", divToSwap[0]);
-        }
-    });
-}
+// Event listener for the drop event
+parent.addEventListener("drop", (event) => {
+  event.preventDefault();
+  if (event.target.classList.contains("image")) {
+    event.target.insertAdjacentHTML("beforebegin", selected.outerHTML);
+    selected.remove();
+    event.target.classList.remove("selected");
+  }
+});
