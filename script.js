@@ -1,54 +1,63 @@
 //your code here
-const images = document.querySelectorAll('.image');
+// Get all the draggable elements
+const draggableElements = document.querySelectorAll('.image');
 
-let draggedImage = null;
+// Variable to store the currently dragged element
+let dragSrcElement = null;
 
-// Add event listeners to each image
-images.forEach((image) => {
-  image.addEventListener('dragstart', dragStart);
-  image.addEventListener('dragover', dragOver);
-  image.addEventListener('dragenter', dragEnter);
-  image.addEventListener('dragleave', dragLeave);
-  image.addEventListener('drop', dragDrop);
-  image.addEventListener('dragend', dragEnd);
-});
-
-// Drag start event handler
-function dragStart() {
-  draggedImage = this;
+// Function to handle drag start event
+function handleDragStart(e) {
+  dragSrcElement = this;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/html', this.innerHTML);
   this.classList.add('selected');
 }
 
-// Drag over event handler
-function dragOver(event) {
-  event.preventDefault();
-}
-
-// Drag enter event handler
-function dragEnter(event) {
-  event.preventDefault();
-  this.classList.add('highlight');
-}
-
-// Drag leave event handler
-function dragLeave() {
-  this.classList.remove('highlight');
-}
-
-// Drag drop event handler
-function dragDrop() {
-  if (draggedImage !== this) {
-    // Swap the background images
-    const tempBackground = this.style.backgroundImage;
-    this.style.backgroundImage = draggedImage.style.backgroundImage;
-    draggedImage.style.backgroundImage = tempBackground;
+// Function to handle drag over event
+function handleDragOver(e) {
+  if (e.preventDefault) {
+    e.preventDefault();
   }
-
-  this.classList.remove('highlight');
+  e.dataTransfer.dropEffect = 'move';
+  return false;
 }
 
-// Drag end event handler
-function dragEnd() {
+// Function to handle drag enter event
+function handleDragEnter(e) {
+  this.classList.add('over');
+}
+
+// Function to handle drag leave event
+function handleDragLeave(e) {
+  this.classList.remove('over');
+}
+
+// Function to handle drop event
+function handleDrop(e) {
+  if (e.stopPropagation) {
+    e.stopPropagation();
+  }
+  if (dragSrcElement !== this) {
+    dragSrcElement.innerHTML = this.innerHTML;
+    this.innerHTML = e.dataTransfer.getData('text/html');
+  }
+  return false;
+}
+
+// Function to handle drag end event
+function handleDragEnd(e) {
   this.classList.remove('selected');
+  draggableElements.forEach((element) => {
+    element.classList.remove('over');
+  });
 }
 
+// Add event listeners to the draggable elements
+draggableElements.forEach((element) => {
+  element.addEventListener('dragstart', handleDragStart, false);
+  element.addEventListener('dragenter', handleDragEnter, false);
+  element.addEventListener('dragover', handleDragOver, false);
+  element.addEventListener('dragleave', handleDragLeave, false);
+  element.addEventListener('drop', handleDrop, false);
+  element.addEventListener('dragend', handleDragEnd, false);
+});
