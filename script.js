@@ -1,19 +1,25 @@
-const parent = document.querySelector("#parent");
-let start = null;
+//your code here
+const draggableElements = document.querySelectorAll('.draggable');
+const container = document.getElementById('container');
+let dragStartIndex;
 
-parent.addEventListener("dragstart", (event) => {
-  start = event.target;
+draggableElements.forEach((element, index) => {
+  element.addEventListener('dragstart', () => {
+    dragStartIndex = index;
+  });
+
+  element.addEventListener('dragover', (event) => {
+    event.preventDefault();
+  });
+
+  element.addEventListener('drop', () => {
+    const dragEndIndex = index;
+    swapElements(dragStartIndex, dragEndIndex);
+  });
 });
 
-parent.addEventListener("dragover", (event) => {
-  event.preventDefault();
-});
-
-parent.addEventListener("drop", (event) => {
-  event.preventDefault();
-  const final = event.target;
-  const parent = final.parentNode;
-  if (final !== start) {
-    parent.insertBefore(start, final);
-  }
-});
+function swapElements(fromIndex, toIndex) {
+  const fromElement = container.children[fromIndex];
+  const toElement = container.children[toIndex];
+  container.insertBefore(toElement, fromElement);
+}
